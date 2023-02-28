@@ -1,0 +1,4 @@
+Manifest.toml
+test/Manifest.toml
+doc/build
+precompile/sysimage.so
