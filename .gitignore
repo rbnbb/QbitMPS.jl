@@ -6,3 +6,4 @@ doc/build
 # precompiled library for faster startup
 precompile/sysimage.so
 test/.JuliaFormatter.toml
+test/output
