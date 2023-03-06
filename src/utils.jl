@@ -29,7 +29,10 @@ Return the amplitude statevector of MPS.
 
 Useful for checking result against exact diagonalisation.
 """
-function mps2statevector(ψ::Union{Vector{ITensor},MPS}; reverse_order=false)::Vector{ComplexF64}
+function mps2statevector(
+    ψ::Union{Vector{ITensor},MPS};
+    reverse_order = false,
+)::Vector{ComplexF64}
     if typeof(ψ) == MPS
         ψ = ψ.data
     end
@@ -55,11 +58,7 @@ end
 
 Return statevector computed using MPS.
 """
-function compute_statevector(
-    circuit::Circuit,
-    numqubits::Integer,
-    max_bond_dimension = 128,
-)
+function compute_statevector(circuit::Circuit, numqubits::Integer, max_bond_dimension = 128)
     psi = simulate_circuit(numqubits, circuit; maxdim = max_bond_dimension)
     return mps2statevector(psi)
 end

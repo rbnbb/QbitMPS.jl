@@ -14,8 +14,8 @@ close(file)
 
 PackageCompiler.create_sysimage(
     ["ITensors", "LinearAlgebra"];
-    sysimage_path="precompile/sysimage.so",
-    precompile_execution_file=fname,
+    sysimage_path = "precompile/sysimage.so",
+    precompile_execution_file = fname,
     project = ".",
 )
 
