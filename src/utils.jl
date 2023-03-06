@@ -29,8 +29,8 @@ Return the amplitude statevector of MPS.
 
 Useful for checking result against exact diagonalisation.
 """
-function mps2statevector(ψ::Union{Vector{ITensor},MPS})::Vector{ComplexF64}
-    if typeof(ψ)== MPS
+function mps2statevector(ψ::Union{Vector{ITensor},MPS}; reverse_order=false)::Vector{ComplexF64}
+    if typeof(ψ) == MPS
         ψ = ψ.data
     end
     ITensors.set_warn_order(25)
@@ -39,8 +39,27 @@ function mps2statevector(ψ::Union{Vector{ITensor},MPS})::Vector{ComplexF64}
     sv = Vector{ComplexF64}()  # statevector
 
     for inds in list_fock_states(length(ψ))
-        inds_from_1 = CartesianIndex(Tuple(map(x -> x + 1, inds)))
+        if reverse_order
+            product_state = Tuple(reverse(map(x -> x + 1, inds)))
+        else
+            product_state = Tuple(map(x -> x + 1, inds))
+        end
+        inds_from_1 = CartesianIndex(product_state)
         push!(sv, T[inds_from_1])
     end
     return sv
+end
+
+"""
+    compute_statevector(algorithm::QuantumAlgorithm, numqubits::Integer, max_bond_dimension=128)
+
+Return statevector computed using MPS.
+"""
+function compute_statevector(
+    circuit::Circuit,
+    numqubits::Integer,
+    max_bond_dimension = 128,
+)
+    psi = simulate_circuit(numqubits, circuit; maxdim = max_bond_dimension)
+    return mps2statevector(psi)
 end

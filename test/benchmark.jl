@@ -83,8 +83,8 @@ function _run_one_benchmark(
     max_bond_dimension::Integer,
     depth = missing,
 )
-    numstate = rand(0:2^numqubits)
-    mps_stats = @timed mps_sv = mps_statevector(numstate, numqubits; max_bond_dimension)
+numstate = rand(0:2^numqubits)
+mps_stats = @timed mps_sv = mps_statevector(numstate, numqubits; max_bond_dimension)
     fft_stats = @timed fft_sv = fft_statevector(numstate, numqubits)
     sigma = sqrt(abs(sum((mps_sv - fft_sv) .^ 2) / (2^numqubits)))
     fidelity = abs((fft_sv' * mps_sv))^2

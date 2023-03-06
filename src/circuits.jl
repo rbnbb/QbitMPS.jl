@@ -1,9 +1,11 @@
 abstract type QuantumAlgorithm end
 struct QFT <: QuantumAlgorithm end
-struct RandomCircuitNN <: QuantumAlgorithm end
+struct RandomCircuitNN <: QuantumAlgorithm
+    depth::Integer
+end
 
 generate_circuit(::Type{QFT}, numqubits::Integer) = quantum_fourier_circuit(numqubits)
-generate_circuit(::Type{RandomCircuitNN}, numqubits::Integer, depth::Integer) = random_circuit_nn(numqubits, depth)
+generate_circuit(algorithm::RandomCircuitNN, numqubits::Integer) = random_circuit_nn(numqubits, algorithm.depth)
 
 @doc raw"""
     quantum_fourier_circuit(numqubits::Int)
@@ -53,7 +55,7 @@ function random_circuit_nn(numqubits::Integer, depth::Integer)::Circuit
             push!(circuit, GateU(rand(3)...), qubit)
         end
         # add 2 qubit gates, alternate control and target qubits according to parity of layer
-        for qubit in (layer%2):2:numqubits
+        for qubit in (layer%2+1):2:numqubits-1
             push!(circuit, GateCX(), qubit, qubit + 1)
         end
     end

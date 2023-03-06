@@ -14,6 +14,6 @@ function simulate_circuit(numqubits::Int, circuit::Circuit; initial_state="0", m
 end
 
 function _circuit2mpsops(circuit::Circuit, qubits)::Vector{ITensor}
-    gate2op(gate) = op(qubits, Circuits.matrix(gate), gate.targets)
+    gate2op(gate) = op(qubits, Circuits.matrix(gate), reverse((circuit.nqubits+1) .- gate.targets))
     return map(gate2op, circuit)
 end
