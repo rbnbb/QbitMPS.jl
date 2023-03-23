@@ -9,7 +9,8 @@ using Circuits
 
 include("utils.jl")
 include("circuits.jl")
-include("simulate_circuit_MPS.jl")
+include("imps.jl")
+include("mpo.jl")
 
 export QuantumAlgorithm, QFT, RandomCircuitNN
 

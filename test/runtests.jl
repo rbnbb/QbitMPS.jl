@@ -1,7 +1,7 @@
 using Test
 using QbitMPS
 
-filelist = String["qft.jl", "random_circuit.jl"]
+filelist = String["qft.jl", "random_circuit.jl", "mpo.jl"]
 
 include("statevector_checker.jl")
 

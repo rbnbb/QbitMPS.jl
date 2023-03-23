@@ -7,3 +7,6 @@ doc/build
 precompile/sysimage.so
 test/.JuliaFormatter.toml
 test/output
+src/MPlayS.jl
+src/ensemble_averaged_entanglement_entropy.jl
+test/state_preparation.jl

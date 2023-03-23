@@ -62,3 +62,33 @@ function random_circuit_nn(numqubits::Integer, depth::Integer)::Circuit
     end
     return circuit
 end
+
+"""
+    random_circuit_lr(numqubits::Integer, depth::Integer)
+
+Return a random quantum circuit consisting of random unitary gates followed by CNOT or CZ between randomly selected qubits (i.e. long-range). The number of layers is given by depth.
+
+For instance a one layer circuit could look like:
+-□-┬☒☒--
+-□-┼┴┼☒-
+-□-☒-┴┼-
+-□----┴-
+with □ random unitaries and -☒ 2 qubits gates like CNOT.
+"""
+function random_circuit_lr(numqubits::Integer, depth::Integer)::Circuit
+    circuit = Circuit(numqubits)
+    for layer in 1:depth
+        # add 1 qubits random unitary
+        for qubit in 1:numqubits
+            push!(circuit, GateU(rand(3)...), qubit)
+        end
+        # add (potentially) long-range 2 qubit gates
+        for target_qubit in 1:numqubits
+            control_qubit = rand(1:numqubits-1)
+            # make sure control_qubit is not equal to target qubit
+            control_qubit = control_qubit < target_qubit ? control_qubit : control_qubit + 1
+            push!(circuit, GateCX(), control_qubit, target_qubit)
+        end
+    end
+    return circuit
+end

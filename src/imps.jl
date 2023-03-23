@@ -12,7 +12,7 @@ function simulate_circuit(
     maxdim = 128,
 )::MPS
     qubits = siteinds("Qubit", numqubits)
-    psi0::MPS = productMPS(qubits, initial_state)  # Inital state |00...0>
+    psi0::MPS = productMPS(qubits, initial_state)
     gate_ops = _circuit2mpsops(circuit, qubits)
     psi = apply(gate_ops, psi0; maxdim)
     return psi
