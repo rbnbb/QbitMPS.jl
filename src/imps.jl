@@ -1,17 +1,12 @@
 """
-    simulate_circuit(numqubits::Int, circuit::Circuit)
+    simulate_circuit_imps(numqubits::Int, circuit::Circuit)
 
 Simulate the application of gates in circuit to an MPS.
 Return the final Matrix Product State (MPS).
 By, default the initial state is |0...0>, it can be changed with keyword argument.
 """
-function simulate_circuit(
-    numqubits::Int,
-    circuit::Circuit;
-    initial_state = "0",
-    maxdim = 128,
-)::MPS
-    qubits = siteinds("Qubit", numqubits)
+function simulate_circuit_imps(circuit::Circuit; initial_state = "0", maxdim = 128)::MPS
+    qubits = siteinds("Qubit", Circuits.numqubits(circuit))
     psi0::MPS = productMPS(qubits, initial_state)
     gate_ops = _circuit2mpsops(circuit, qubits)
     psi = apply(gate_ops, psi0; maxdim)

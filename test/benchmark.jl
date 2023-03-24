@@ -1,13 +1,10 @@
 using RecipesBase
 using JLD2
 
+include("statevector_checker.jl")
+
 push!(LOAD_PATH, pwd())
 using QbitMPS
-
-include("qft.jl")
-
-@enum mps_method imps
-@enum check_method FFT statevector
 
 const file_storage_id = 1
 
@@ -46,26 +43,30 @@ Wrapper for data to facilitate plotting and storage.
 # Fields
 
   - `algorithm::quantum_algorithm`:
-  - `method::mps_method`:
-  - `checker::check_method`:
+  - `method::Simulator`:
   - `runs::Vector{OneRun}`:
 """
 struct BenchmarkResults
-    algorithm::Type{<:QuantumAlgorithm}
-    method::mps_method
-    checker::check_method
+    algorithm::QuantumAlgorithm
+    method::Simulator
     runs::Vector{OneBenchmark}
 end
 
 function run_benchmark(
-    algorithm::Type{<:QuantumAlgorithm},
+    algorithm::QuantumAlgorithm,
+    method::Simulator,
     numqubits,
-    max_bond_dimension,
-    depth = missing,
+    max_bond_dimension;
+    mentions::String = "",
 )::BenchmarkResults
-    runs = _run_one_benchmark.(algorithm, numqubits, max_bond_dimension, depth)
-    r = BenchmarkResults(algorithm, imps, FFT, runs)
-    result_name = "$(string(algorithm))_n=$(numqubits)_chi=$(max_bond_dimension)"
+    runs = Vector{OneBenchmark}(undef, length(numqubits) * length(max_bond_dimension))
+    j = 1
+    for qubit in numqubits, maxdim in max_bond_dimension
+        runs[j] = _run_one_benchmark(algorithm, method, qubit, maxdim)
+        j += 1
+    end
+    r = BenchmarkResults(algorithm, method, runs)
+    result_name = "$(string(algorithm))_$(string(method))_n=$(numqubits)_chi=$(max_bond_dimension)_$mentions"
     fname = "./test/output/data_$(file_storage_id).jld2"
     jldopen(fname, "a+") do file
         file[result_name] = r
@@ -78,35 +79,77 @@ function open_datafile()
 end
 
 function _run_one_benchmark(
-    ::Type{QFT},
-    numqubits::Integer,
-    max_bond_dimension::Integer,
-    depth = missing,
+    algo::QuantumAlgorithm,
+    method::Simulator,
+    numqubits,
+    max_bond_dimension,
 )
-    numstate = rand(0:2^numqubits)
-    mps_stats = @timed mps_sv = mps_statevector(numstate, numqubits; max_bond_dimension)
-    fft_stats = @timed fft_sv = fft_statevector(numstate, numqubits)
-    sigma = sqrt(abs(sum((mps_sv - fft_sv) .^ 2) / (2^numqubits)))
-    fidelity = abs((fft_sv' * mps_sv))^2
+    circ = generate_circuit(algo, numqubits)
+    mps_stats = @timed psi = simulate_circuit(circ, method; maxdim = max_bond_dimension)
+    mps_sv = QbitMPS.mps2statevector(psi)
+    sv_stats = @timed sv = check_statevector(circ, numqubits)
+    sigma = sqrt(abs(sum((mps_sv - sv) .^ 2) / (2^numqubits)))
+    fidelity = abs((sv' * mps_sv))^2
     return OneBenchmark(
         numqubits,
         max_bond_dimension,
         sigma,
         fidelity,
-        missing,
+        hasproperty(algo, :depth) ? algo.depth : missing,
         mps_stats.time,
         mps_stats.bytes,
-        fft_stats.time,
-        fft_stats.bytes,
+        sv_stats.time,
+        sv_stats.bytes,
     )
+    nothing
 end
+
+function compare(
+    r1::BenchmarkResults,
+    r2::BenchmarkResults,
+    xaxis,
+    yax1,
+    yaxis...;
+    kwargs...,
+)
+    p = plot(r1, xaxis, yax1; kwargs...)
+    plot!(r2, xaxis, yax1)
+    for yax in yaxis
+        plot!(r1, xaxis, yax)
+        plot!(r2, xaxis, yax)
+    end
+    return p
+end
+
+# function _run_one_benchmark(
+#     ::Type{QFT},
+#     numqubits::Integer,
+#     max_bond_dimension::Integer,
+# )
+#     numstate = rand(0:2^numqubits)
+#     mps_stats = @timed mps_sv = mps_statevector(numstate, numqubits; max_bond_dimension)
+#     fft_stats = @timed fft_sv = fft_statevector(numstate, numqubits)
+#     sigma = sqrt(abs(sum((mps_sv - fft_sv) .^ 2) / (2^numqubits)))
+#     fidelity = abs((fft_sv' * mps_sv))^2
+#     return OneBenchmark(
+#         numqubits,
+#         max_bond_dimension,
+#         sigma,
+#         fidelity,
+#         missing,
+#         mps_stats.time,
+#         mps_stats.bytes,
+#         fft_stats.time,
+#         fft_stats.bytes,
+#     )
+# end
 
 @recipe f(::Type{BenchmarkResults}, r::BenchmarkResults) = r.runs
 
 @recipe function f(results::BenchmarkResults, xaxis, yaxis)
     xlabel --> string(xaxis)
     ylabel --> string(yaxis)
-    label --> string(results.algorithm) * " " * string(yaxis)
+    label --> string(results.algorithm) * " " * string(results.method) * " " * string(yaxis)
     markershape --> :circle
     xs = getproperty.(results.runs, (xaxis))
     ys = getproperty.(results.runs, (yaxis))

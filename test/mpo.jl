@@ -1,7 +1,6 @@
 using QbitMPS: simulate_circuit_mpo, random_circuit_lr, random_circuit_nn, mps2statevector
 using QbitMPS: Circuit, GateH, GateCX, GateU
 
-
 @testset "Test 1 qubit gates for MPO simulator" begin
     function test_1qubit_unitaries(numqubits::Integer)
         function random_circuit_only_1q_unitaries(numqubits::Integer)

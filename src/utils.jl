@@ -52,13 +52,3 @@ function mps2statevector(
     end
     return sv
 end
-
-"""
-    compute_statevector(algorithm::QuantumAlgorithm, numqubits::Integer, max_bond_dimension=128)
-
-Return statevector computed using MPS.
-"""
-function compute_statevector(circuit::Circuit, numqubits::Integer, max_bond_dimension = 128)
-    psi = simulate_circuit(numqubits, circuit; maxdim = max_bond_dimension)
-    return mps2statevector(psi)
-end

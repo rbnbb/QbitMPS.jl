@@ -5,7 +5,7 @@
     for test_id in 1:numcircuits
         @debug "Random Circuit #$(test_id)"
         circuit = generate_circuit(RandomCircuitNN(depth), numqubits)
-        mps_sv = QbitMPS.compute_statevector(circuit, numqubits)
+        mps_sv = mps2statevector(simulate_circuit_imps(circuit))
         check_sv = check_statevector(circuit, numqubits)
         @test check_sv ≈ mps_sv
     end

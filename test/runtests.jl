@@ -1,5 +1,6 @@
 using Test
 using QbitMPS
+using QbitMPS: mps2statevector, simulate_circuit_imps, simulate_circuit_mpo
 
 filelist = String["qft.jl", "random_circuit.jl", "mpo.jl"]
 

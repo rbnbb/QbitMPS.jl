@@ -33,6 +33,10 @@ end
 
 siteinds(mpo::CircuitMPO) = [ITensors.siteinds(mpo, j; plev = 0)[1] for j in 1:length(mpo)]
 
+function default_maxdim()
+    return 64
+end
+
 function _add_single_qubit_gate_to_mpo!(mpo::CircuitMPO, gate::CircuitGate)
     numqubits = length(mpo)
     target = numqubits - gate.targets[1] + 1  # count qubits from the end
@@ -89,11 +93,18 @@ function apply!(mpo::CircuitMPO, gate::CircuitGate)
     return nothing
 end
 
-function compile_circuit_to_mpo(circuit::Circuit)
+function truncate_mpo_svd!(mpo::CircuitMPO)
+    nothing
+end
+
+function compile_circuit_to_mpo(circuit::Circuit; maxdim = default_maxdim())
     numqubits = circuit.nqubits
     mpo = CircuitMPO(numqubits)
     for gate in circuit
         apply!(mpo, gate)
+        if max(linkdims(mpo)...) > maxdim
+            truncate_mpo_svd!(mpo)
+        end
     end
     return mpo
 end
@@ -113,8 +124,8 @@ function apply!(mpo::CircuitMPO, psi::MPS; kwargs...)
     return nothing
 end
 
-function simulate_circuit_mpo(circuit::Circuit, maxdim = 128)
-    mpo::CircuitMPO = compile_circuit_to_mpo(circuit)
+function simulate_circuit_mpo(circuit::Circuit; maxdim = default_maxdim())
+    mpo::CircuitMPO = compile_circuit_to_mpo(circuit; maxdim)
     qubits = siteinds(mpo)
     psi0::MPS = productMPS(qubits, "0")  # Inital state |00...0>
     apply!(mpo, psi0; maxdim)

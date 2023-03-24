@@ -11,10 +11,12 @@ include("utils.jl")
 include("circuits.jl")
 include("imps.jl")
 include("mpo.jl")
+include("simulator.jl")
 
-export QuantumAlgorithm, QFT, RandomCircuitNN
+export QuantumAlgorithm, QFT, RandomCircuitNN, RandomCircuitLR
 
 export generate_circuit
+export Simulator, sMPO, sMPS
 export simulate_circuit
 
 end # module QbitMPS

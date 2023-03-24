@@ -3,10 +3,15 @@ struct QFT <: QuantumAlgorithm end
 struct RandomCircuitNN <: QuantumAlgorithm
     depth::Integer
 end
+struct RandomCircuitLR <: QuantumAlgorithm
+    depth::Integer
+end
 
 generate_circuit(::Type{QFT}, numqubits::Integer) = quantum_fourier_circuit(numqubits)
 generate_circuit(algorithm::RandomCircuitNN, numqubits::Integer) =
     random_circuit_nn(numqubits, algorithm.depth)
+generate_circuit(algorithm::RandomCircuitLR, numqubits::Integer) =
+    random_circuit_lr(numqubits, algorithm.depth)
 
 @doc raw"""
     quantum_fourier_circuit(numqubits::Int)
