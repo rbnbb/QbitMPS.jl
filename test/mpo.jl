@@ -4,7 +4,7 @@ using QbitMPS: Circuit, GateH, GateCX, GateU
 @testset "Test 1 qubit gates for MPO simulator" begin
     function test_1qubit_unitaries(numqubits::Integer)
         function random_circuit_only_1q_unitaries(numqubits::Integer)
-            circuit = Circuit(numqubits)
+            circuit = Circuit()
             for qubit in 1:numqubits
                 push!(circuit, GateU(rand(3)...), qubit)
             end
@@ -26,7 +26,7 @@ end
 
 @testset "Test 2 qubit nearest neighbour gates for MPO simulator" begin
     function test_bell_preparation_with_CX()
-        circ = Circuit(2)
+        circ = Circuit()
         push!(circ, GateH(), 1)
         push!(circ, GateCX(), 1, 2)
         return mps2statevector(simulate_circuit_mpo(circ)) ≈ check_statevector(circ, 4)[1:4]
@@ -48,7 +48,7 @@ end
 
 @testset "Test 2 qubits long-range gates for MPO simulator" begin
     function test_bell_preparation_3q()
-        circ = Circuit(3)
+        circ = Circuit()
         push!(circ, GateH(), 1)
         push!(circ, GateCX(), 1, 3)
         mps_sv = mps2statevector(simulate_circuit_mpo(circ))

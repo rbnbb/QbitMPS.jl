@@ -5,7 +5,7 @@ classical Matrix Product State (MPS) methods.
 module QbitMPS
 
 using ITensors
-using Circuits
+using MimiqCircuits
 
 include("utils.jl")
 include("circuits.jl")

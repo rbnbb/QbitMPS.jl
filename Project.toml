@@ -4,9 +4,9 @@ authors = ["rbn <drbn.rbn@tutanota.com>"]
 version = "0.1.0"
 
 [deps]
-Circuits = "0891af99-d974-44fe-bb1f-8df04484ce9a"
 ITensors = "9136182c-28ba-11e9-034c-db9fb085ebd5"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+MimiqCircuits = "281e006c-9395-434b-8b58-3065901f9db3"
 StateVecSim = "831d5832-eada-418b-9919-d749623df8ab"
 
 [extras]

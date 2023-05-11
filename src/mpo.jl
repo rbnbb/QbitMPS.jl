@@ -1,7 +1,7 @@
 import ITensors.siteinds
 
 """
-    CircMPO
+    CircuitMPO
 
 An MPO respresentation of a quantum circuit.
 """
@@ -41,7 +41,7 @@ function _add_single_qubit_gate_to_mpo!(mpo::CircuitMPO, gate::CircuitGate)
     numqubits = length(mpo)
     target = numqubits - gate.targets[1] + 1  # count qubits from the end
     site = siteinds(mpo, target; plev = 1)[1]
-    op_1q = ITensor(Circuits.matrix(gate.gate), site', site)  # BE CAREFUL where  you put the prime
+    op_1q = ITensor(MimiqCircuits.matrix(gate.gate), site', site)  # BE CAREFUL where  you put the prime
     mpo.data[target] = setprime(mpo.data[target] * op_1q, 1; plev = 2)
     return nothing
 end
@@ -52,7 +52,7 @@ function _add_2_qubit_gate!(mpo::CircuitMPO, gate::CircuitGate)
     @assert 0 < control <= numqubits && 0 < target <= numqubits && control != target
     ctrl_idx = siteinds(mpo, control; plev = 1)[1]
     tgt_idx = siteinds(mpo, target; plev = 1)[1]
-    op_2q = ITensor(Circuits.matrix(gate.gate), tgt_idx', ctrl_idx', tgt_idx, ctrl_idx)
+    op_2q = ITensor(MimiqCircuits.matrix(gate.gate), tgt_idx', ctrl_idx', tgt_idx, ctrl_idx)
     # Q, T = qr(op_2q, (ctrl_idx', ctrl_idx))
     Q, S, T = svd(op_2q, (ctrl_idx', ctrl_idx); cutoff = 1e-18)
     T = S * T
@@ -93,12 +93,12 @@ function apply!(mpo::CircuitMPO, gate::CircuitGate)
     return nothing
 end
 
-function truncate_mpo_svd!(mpo::CircuitMPO)
-    nothing
-end
+# function truncate_mpo_svd!(mpo::CircuitMPO)
+#     nothing
+# end
 
 function compile_circuit_to_mpo(circuit::Circuit; maxdim = default_maxdim())
-    numqubits = circuit.nqubits
+    numqubits = MimiqCircuits.numqubits(circuit)
     mpo = CircuitMPO(numqubits)
     for gate in circuit
         apply!(mpo, gate)
