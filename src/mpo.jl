@@ -102,9 +102,9 @@ function compile_circuit_to_mpo(circuit::Circuit; maxdim = default_maxdim())
     mpo = CircuitMPO(numqubits)
     for gate in circuit
         apply!(mpo, gate)
-        if max(linkdims(mpo)...) > maxdim
-            truncate_mpo_svd!(mpo)
-        end
+        # if max(linkdims(mpo)...) > maxdim
+        #     truncate_mpo_svd!(mpo)
+        # end
     end
     return mpo
 end
@@ -130,4 +130,13 @@ function simulate_circuit_mpo(circuit::Circuit; maxdim = default_maxdim())
     psi0::MPS = productMPS(qubits, "0")  # Inital state |00...0>
     apply!(mpo, psi0; maxdim)
     return psi0
+end
+
+function contract_mpos(O1, O2)
+    T = O1[1] * O2[1]
+    for j in 2:length(O1)
+        T *= O1[j]
+        T *= O2[j]
+    end
+    return T
 end

@@ -12,6 +12,7 @@ include("circuits.jl")
 include("imps.jl")
 include("mpo.jl")
 include("simulator.jl")
+include("truncate.jl")
 
 export QuantumAlgorithm, QFT, RandomCircuitNN, RandomCircuitLR
 

@@ -4,3 +4,6 @@ remove_extra_newlines = true
 import_to_using = true
 format_docstrings = true
 separate_kwargs_with_semicolon = true
+always_use_return = true
+whitespace_in_kwargs = false
+join_lines_based_on_source = true
