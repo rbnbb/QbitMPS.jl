@@ -1,5 +1,6 @@
 abstract type QuantumAlgorithm end
 struct QFT <: QuantumAlgorithm end
+struct QFA <: QuantumAlgorithm end
 struct RandomCircuitNN <: QuantumAlgorithm
     depth::Integer
 end
@@ -7,7 +8,8 @@ struct RandomCircuitLR <: QuantumAlgorithm
     depth::Integer
 end
 
-generate_circuit(::Type{QFT}, numqubits::Integer) = quantum_fourier_circuit(numqubits)
+generate_circuit(::QFT, numqubits::Integer) = quantum_fourier_circuit(numqubits)
+generate_circuit(::QFA, numqubits::Integer) = quantum_full_adder(numqubits ÷ 3)
 generate_circuit(algorithm::RandomCircuitNN, numqubits::Integer) =
     random_circuit_nn(numqubits, algorithm.depth)
 generate_circuit(algorithm::RandomCircuitLR, numqubits::Integer) =
@@ -47,10 +49,10 @@ end
 Return a random quantum circuit consisting of random unitary gates followed by CNOT or CZ between nearest neighbours. The number of layers is given by depth.
 
 For instance a 2 layer circuit would look like:
--□-┬-□-┬-
--□-☒-□-☒-
--□-┬-□-┬-
--□-☒-□-☒-
+─□─┬─□─┬─
+─□─☒─□─☒─
+─□─┬─□─┬─
+─□─☒─□─☒─
 with □ random unitaries and -☒ 2 qubits gates like CNOT.
 """
 function random_circuit_nn(numqubits::Integer, depth::Integer)::Circuit
@@ -74,10 +76,10 @@ end
 Return a random quantum circuit consisting of random unitary gates followed by CNOT or CZ between randomly selected qubits (i.e. long-range). The number of layers is given by depth.
 
 For instance a one layer circuit could look like:
--□-┬☒☒--
--□-┼┴┼☒-
--□-☒-┴┼-
--□----┴-
+─□─┬☒☒──
+─□─┼┴┼☒─
+─□─☒─┴┼─
+─□────┴─
 with □ random unitaries and -☒ 2 qubits gates like CNOT.
 """
 function random_circuit_lr(numqubits::Integer, depth::Integer)::Circuit
@@ -96,4 +98,30 @@ function random_circuit_lr(numqubits::Integer, depth::Integer)::Circuit
         end
     end
     return circuit
+end
+
+"""
+    quantum_full_adder(nadders::Integer)
+
+Return nadders quantum full adder circuits liked.
+
+One quantum full adder has the following circuit:
+|Cin> ─────┬─╳─── |S>
+|A>  ─┬─┬─│─│─┬─ |A>
+|B>  ─┼─╳─┼─┴─╳─ |B>
+|0>  ─╳───╳───── |Cout>
+where the symbol "─╳" represents a CX/CCX gate.
+"""
+function quantum_full_adder(nadders::Integer)
+    first = 1
+    circ = Circuit()
+    for j in 1:nadders
+        push!(circ, GateCCX(), first + 1, first + 2, first + 3)
+        push!(circ, GateCX(), first + 1, first + 2)
+        push!(circ, GateCCX(), first, first + 2, first + 3)
+        push!(circ, GateCX(), first + 2, first)
+        push!(circ, GateCX(), first + 1, first + 2)
+        first += 3
+    end
+    return circ
 end

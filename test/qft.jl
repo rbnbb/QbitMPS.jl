@@ -18,7 +18,7 @@ Compute Quantum Fourier Transfor of number state using MPS
 """
 function mps_statevector(number::Int, numbits::Int; max_bond_dimension = 128)
     @assert number < 2^numbits "Cannot represent $number in $numbits bits"
-    input_state = [string(x) for x in QbitMPS.int2binary(number, numbits)]
+    input_state = String[string(x) for x in QbitMPS.int2binary(number, numbits)]
     qft_circuit = QbitMPS.quantum_fourier_circuit(numbits)
     psi = simulate_circuit_imps(
         qft_circuit;
@@ -30,7 +30,7 @@ end
 
 @testset "Quantum Fourier Transform" begin
     numqubits = 5
-    numcircuits = 1
+    numcircuits = 3
     for number in rand(10:2^numqubits-1, numcircuits)
         @debug "Testing QFT( |$(number)> )"
         @test fft_statevector(number, numqubits) ≈ mps_statevector(number, numqubits)

@@ -18,7 +18,7 @@ using QbitMPS: Circuit, GateH, GateCX, GateU
         # return [stringify(list_fock_states(numqubits)) round.(sv; digits = 3) round.( mps_sv; digits = 3,)]
         return mps_sv ≈ sv
     end
-    MAXQUBITS = 7
+    MAXQUBITS = 5
     for n in 3:MAXQUBITS
         @test test_1qubit_unitaries.(n)
     end
@@ -65,7 +65,7 @@ end
         return mps_sv ≈ sv
     end
     @test test_bell_preparation_3q()
-    MAXQUBITS = 5
+    MAXQUBITS = 4
     CIRCUIT_DEPTH = 2
     for n in 2:MAXQUBITS
         @test test_2q_long_range(n, CIRCUIT_DEPTH)

@@ -35,14 +35,16 @@ function put_in_right_canonical_form!(M::Vector{ITensor})
         return nothing
     end
     # sweep right to left and use qr decomposition
-    for j in length(M)-1:-1:2
+    # M[end] = M[end] ./ sqrt((M[end] * dag(M[end])).tensor[1])
+    for j in length(M):-1:2
         R, T = qr(M[j], uniqueinds(M[j], M[j-1]); tags=tags(commonind(M[j], M[j-1])))
         M[j] = R
         M[j-1] *= T
     end
+    # M[1] = M[1] ./ sqrt((M[1] * dag(M[1])).tensor[1])
 end
 
-function direct_svd_truncation!(M::Vector{ITensor}, maxdim=div(max(maxdim.(M)...), 2))
+function direct_svd_truncation!(M::Vector{ITensor}, maxdim=max(maxdim.(M)...))
     if !is_in_right_canonical_form(M)
         put_in_right_canonical_form!(M)
     end
