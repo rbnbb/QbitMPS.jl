@@ -18,5 +18,7 @@ export QuantumAlgorithm, QFT, QFA, RandomCircuitNN, RandomCircuitLR
 export generate_circuit
 export Simulator, sMPO, sMPS
 export simulate_circuit
+export compile_circuit_to_mpo
+export apply!
 
 end # module QbitMPS
