@@ -1,11 +1,15 @@
 using Test
 using Logging
+
+using ITensors
 using QbitMPS
 using QbitMPS: mps2statevector, simulate_circuit_imps, simulate_circuit_mpo
+using QbitMPS: siteinds, apply!, direct_svd_truncation!, variationally_compress
 
 filelist = String[
-                  # "qft.jl",
-                  # "random_circuit.jl",
+                  "qft.jl",
+                  "qfa.jl",
+                  "random_circuit.jl",
                   "mpo.jl",
                  ]
 
