@@ -52,3 +52,24 @@ function mps2statevector(
     end
     return sv
 end
+
+ppsi(psi) = [join.(list_fock_states(length(psi))) mps2statevector(psi)]
+
+"""
+
+SeeITensor - pretty print ITensor with the Qubit index as the third dimension,
+this allows interpreting it as the notation:
+[ |0> ]
+"""
+function seit(A::ITensor)
+    sidx = inds(A; tags="Site")
+    lidx = inds(A; tags="Link")
+    sitenum(l) = parse(Int, match(r"[ln]=(\d)", string(tags(l))).captures[1]) # site number
+    if length(lidx)>1 && sitenum(lidx[1]) > sitenum(lidx[2])  #leftmost has smaller number
+        lidx = (lidx[2], lidx[1])
+    end
+    return permute(A, lidx..., sidx...; allow_alias=true).tensor
+end
+
+# debug helper line:
+# <BS>psi = productMPS(siteinds(mpo), ["0", "1", "0", "0"]);apply!(mpo, psi); ppsi(psi)[ppsi(psi)[:,2] .!= 0, :]

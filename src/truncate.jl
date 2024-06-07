@@ -9,7 +9,7 @@ function is_in_right_canonical_form(M::Vector{ITensor})
     if !first_is_right_normalized
         return false
     else
-        is_right_normalized(M, j) = contract_with_dag_self(M[j], M[j-1]).tensor ≈ I
+        is_right_normalized(M, j) = contract_with_dag_self(M[j], M[j-1]).tensor ≈ LinearAlgebra.I
         for j in 2:length(M)
             if !is_right_normalized(M, j)
                 return false

@@ -5,5 +5,8 @@
 push!(LOAD_PATH, pwd())
 
 using Documenter, QbitMPS
+using DocumenterLaTeX
 
-makedocs(; sitename = "QbitMPS")
+makedocs(format=LaTeX(platform="none"),
+         pages = ["Home" => "index.md",],
+         sitename = "QbitMPS")
